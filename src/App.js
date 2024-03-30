@@ -1,11 +1,21 @@
 import "./App.css";
-
+import { useState } from "react";
 import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
 
 const TodoItemInputField = (props) => {
+  const [input, setInput] = useState("");
   return (
     <div>
-      <TextField />
+      <TextField
+        id="todo-item-input"
+        lable="Todo Item"
+        variant="outlined"
+        value={input}
+        // onChange = 바꿔라, e(이벤트)가 일어날때 setInput을 value로
+        onChange={(e) => setInput(e.target.value)}
+      />
+      <Button variant="outlined">Submit</Button>
     </div>
   );
 };
