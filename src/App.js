@@ -29,10 +29,30 @@ const TodoItemInputField = (props) => {
   );
 };
 
+const TodoItem = (props) => {
+  // 체크하면 끝내는 코드
+  const style = props.todoItem.isFinished
+    ? { textDecoration: "line-through" }
+    : {};
+  return (
+    <li>
+      <span style={style} onClick={() => props.onTodoItemClick(props.todoItem)}>
+        {props.todoItem.todoItemContent}
+      </span>
+    </li>
+  );
+};
+
 // 버튼으로 입력한 내용들이 저장될 컴포넌트
 const TodoItemList = (props) => {
   const todoList = props.todoItemList.map((todoItem, index) => {
-    return <li key={index}>{todoItem.todoItemContent}</li>;
+    return (
+      <TodoItem
+        key={todoItem.id}
+        todoItem={todoItem}
+        onTodoItemClick={props.onTodoItemClick}
+      />
+    );
   });
   return (
     <div>
@@ -57,11 +77,30 @@ function App() {
     ]);
   };
 
+  const onTodoItemClick = (clickedTodoItem) => {
+    setTodoItemList(
+      todoItemList.map((todoItem) => {
+        if (clickedTodoItem.id === todoItem.id) {
+          return {
+            id: clickedTodoItem.id,
+            todoItemContent: clickedTodoItem.todoItemContent,
+            isFinished: !clickedTodoItem.isFinished,
+          };
+        } else {
+          return todoItem;
+        }
+      })
+    );
+  };
+
   return (
     <div className="App">
       {/* 3.  */}
       <TodoItemInputField onSubmit={onSubmit} />
-      <TodoItemList todoItemList={[todoItemList]} />
+      <TodoItemList
+        todoItemList={todoItemList}
+        onTodoItemClick={onTodoItemClick}
+      />
     </div>
   );
 }
