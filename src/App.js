@@ -39,6 +39,12 @@ const TodoItem = (props) => {
       <span style={style} onClick={() => props.onTodoItemClick(props.todoItem)}>
         {props.todoItem.todoItemContent}
       </span>
+      <Button
+        variant="outlined"
+        onClick={() => props.onRemoveClick(props.todoItem)}
+      >
+        Remove
+      </Button>
     </li>
   );
 };
@@ -51,6 +57,7 @@ const TodoItemList = (props) => {
         key={todoItem.id}
         todoItem={todoItem}
         onTodoItemClick={props.onTodoItemClick}
+        onRemoveClick={props.onRemoveClick}
       />
     );
   });
@@ -93,6 +100,14 @@ function App() {
     );
   };
 
+  const onRemoveClick = (removedTodoItem) => {
+    setTodoItemList(
+      todoItemList.filter((todoItem) => {
+        return todoItem.id !== removedTodoItem.id;
+      })
+    );
+  };
+
   return (
     <div className="App">
       {/* 3.  */}
@@ -100,6 +115,7 @@ function App() {
       <TodoItemList
         todoItemList={todoItemList}
         onTodoItemClick={onTodoItemClick}
+        onRemoveClick={onRemoveClick}
       />
     </div>
   );
