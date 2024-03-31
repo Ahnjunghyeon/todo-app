@@ -3,10 +3,16 @@ import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 
+//  함수를 정의하는 공간
 const TodoItemInputField = (props) => {
   const [input, setInput] = useState("");
+  const onSubmit = () => {
+    props.onSubmit(input);
+    setInput("");
+  };
   return (
     <div>
+      {/* 1. 텍스트가 입력될 창 만들기. */}
       <TextField
         id="todo-item-input"
         lable="Todo Item"
@@ -15,7 +21,10 @@ const TodoItemInputField = (props) => {
         // onChange = 바꿔라, e(이벤트)가 일어날때 setInput을 value로
         onChange={(e) => setInput(e.target.value)}
       />
-      <Button variant="outlined">Submit</Button>
+      {/* 2. 입력한 것을 저장할 버튼 생성 */}
+      <Button variant="outlined" onClick={onSubmit}>
+        Submit
+      </Button>
     </div>
   );
 };
@@ -23,7 +32,7 @@ const TodoItemInputField = (props) => {
 function App() {
   return (
     <div className="App">
-      <TodoItemInputField />
+      <TodoItemInputField onSubmit={() => {}} />
     </div>
   );
 }
