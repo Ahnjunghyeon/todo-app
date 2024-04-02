@@ -2,7 +2,27 @@ import "./App.css";
 import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyA-j8rkBZ9eFc7SNzspHT73dkT8MRINADA",
+  authDomain: "todo-list-app-d25b4.firebaseapp.com",
+  projectId: "todo-list-app-d25b4",
+  storageBucket: "todo-list-app-d25b4.appspot.com",
+  messagingSenderId: "662415885337",
+  appId: "1:662415885337:web:784ef3ef8b7dd47cc2d688",
+  measurementId: "G-HT6QKTGT9L",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 //  함수를 정의하는 공간
 const TodoItemInputField = (props) => {
   const [input, setInput] = useState("");
@@ -84,6 +104,7 @@ function App() {
     ]);
   };
 
+  //  입력된 값을 map을통해서 리스트로 변환해줌
   const onTodoItemClick = (clickedTodoItem) => {
     setTodoItemList(
       todoItemList.map((todoItem) => {
@@ -100,6 +121,7 @@ function App() {
     );
   };
 
+  // 지우는 함수
   const onRemoveClick = (removedTodoItem) => {
     setTodoItemList(
       todoItemList.filter((todoItem) => {
@@ -115,6 +137,7 @@ function App() {
       <TodoItemList
         todoItemList={todoItemList}
         onTodoItemClick={onTodoItemClick}
+        // 지우는 코드
         onRemoveClick={onRemoveClick}
       />
     </div>
