@@ -1,10 +1,19 @@
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  setDoc,
+  doc,
+  deleteDoc,
+  getDocs,
+} from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -23,6 +32,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const db = getFirestore(app);
+
 //  함수를 정의하는 공간
 const TodoItemInputField = (props) => {
   const [input, setInput] = useState("");
@@ -30,6 +41,7 @@ const TodoItemInputField = (props) => {
     props.onSubmit(input);
     setInput("");
   };
+
   return (
     <div>
       {/* 1. 텍스트가 입력될 창 만들기. */}
@@ -93,7 +105,31 @@ let todoItemId = 0;
 function App() {
   const [todoItemList, setTodoItemList] = useState([]);
 
-  const onSubmit = (newTodoItem) => {
+  // 앱을 새로고침해도 내용들이
+  const syncTodoItemListStateWithFirestore = () => {
+    getDocs(collection(db, "todoItem")).then((querySnapshot) => {
+      const firestoreTodoItemList = [];
+      querySnapshot.forEach((doc) => {
+        firestoreTodoItemList.push({
+          id: doc.id,
+          // todoItemContent 함수에 리스트로 저장되어서 새로고침해도 보이게
+          todoItemContent: doc.data().todoItemContent,
+          isFinished: doc.data().isFinished,
+        });
+      });
+      setTodoItemList(firestoreTodoItemList);
+    });
+  };
+  useEffect(() => {
+    syncTodoItemListStateWithFirestore();
+  }, []);
+
+  const onSubmit = async (newTodoItem) => {
+    await addDoc(collection(db, "todoItem"), {
+      todoItemContent: newTodoItem,
+      inFinished: false,
+    });
+    syncTodoItemListStateWithFirestore();
     setTodoItemList([
       ...todoItemList,
       {
@@ -105,29 +141,21 @@ function App() {
   };
 
   //  입력된 값을 map을통해서 리스트로 변환해줌
-  const onTodoItemClick = (clickedTodoItem) => {
-    setTodoItemList(
-      todoItemList.map((todoItem) => {
-        if (clickedTodoItem.id === todoItem.id) {
-          return {
-            id: clickedTodoItem.id,
-            todoItemContent: clickedTodoItem.todoItemContent,
-            isFinished: !clickedTodoItem.isFinished,
-          };
-        } else {
-          return todoItem;
-        }
-      })
+  const onTodoItemClick = async (clickedTodoItem) => {
+    const todoItemRef = doc(db, "todoItem", clickedTodoItem.id);
+    await setDoc(
+      todoItemRef,
+      { isFiniished: !clickedTodoItem.isFinished },
+      { merge: true }
     );
+    syncTodoItemListStateWithFirestore();
   };
 
   // 지우는 함수
-  const onRemoveClick = (removedTodoItem) => {
-    setTodoItemList(
-      todoItemList.filter((todoItem) => {
-        return todoItem.id !== removedTodoItem.id;
-      })
-    );
+  const onRemoveClick = async (removedTodoItem) => {
+    const todoItemRef = doc(db, "todoItem", removedTodoItem.id);
+    await deleteDoc(todoItemRef);
+    syncTodoItemListStateWithFirestore();
   };
 
   return (
